@@ -2,7 +2,7 @@
  * File:   main.cpp
  * Author: Robert Duncan
  * Created on 22 April 2019, 12:05 PM
- * Purpose:  Yahtzee V2
+ * Purpose:  Yahtzee V6
  */
 
 //System Libraries
@@ -50,8 +50,8 @@ int main(int argc, char** argv) {
     
     //Open files
     fstream oldScre,newScre;
-    oldScre.open("oldScore.txt", ios::out);
-    newScre.open("newScore.txt", ios::in | ios::out);
+    oldScre.open("oldScore.dat", ios::out);
+    newScre.open("newScore.dat", ios::in | ios::out);
     
     //Overwrite old score with new score
     new2Old(oldScre,newScre);
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
     }
     
     //Output scoreboard to file
-    fBoard(card,newScre);
+    fBoard(card,newScre,lName);
     
     //Close file
     oldScre.close();
