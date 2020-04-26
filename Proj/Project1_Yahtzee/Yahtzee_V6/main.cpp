@@ -12,7 +12,7 @@
 #include <iomanip>      //Formatting
 #include <list>         //Lists
 #include <set>          //Sets
-//
+#include <fstream>      //File I/O
 using namespace std;    //Standard Name-space under which System Libraries reside
 
 //User Libraries
@@ -30,7 +30,8 @@ void cardLw(Score &,set<int> &);
 void intro();
 void showSet(set<int>);
 void showList(list<string>);
-
+void fBoard(Score &,fstream &,string);
+void new2Old(fstream &,fstream &);
 //Execution Begins Here!
 int main(int argc, char** argv) {
     //Set the random number seed
@@ -46,6 +47,14 @@ int main(int argc, char** argv) {
     //queue<int>preR2;                //Roll before previous roll
     string lName="";                //Local variable for player's name
     set<int> prvScrd;               //Previously used categories
+    
+    //Open files
+    fstream oldScre,newScre;
+    oldScre.open("oldScore.txt", ios::out);
+    newScre.open("newScore.txt", ios::in | ios::out);
+    
+    //Overwrite old score with new score
+    new2Old(oldScre,newScre);
     
     //Prompt for intro
     cout<<"Would you like to read a quick intro of Yahtzee."<<endl;
@@ -65,6 +74,13 @@ int main(int argc, char** argv) {
         inScre(diceRll,card,lName,prvScrd); //Input score
     }
     
+    //Output scoreboard to file
+    fBoard(card,newScre);
+    
+    //Close file
+    oldScre.close();
+    newScre.close();
+    
     //Exit the program
     return 0;
 }
@@ -77,7 +93,6 @@ void inScre(Dice diceRll[],Score &card, string lName,set<int> &prvScrd){
             "table above."<<endl;
     cout<<"Enter the number in the brackets on the left to select."<<endl;
     cin>>input;
-    
     //Input validation
     while(input<1||input>13||card.getChk(input-1)==true){
         //Input validation to make sure its a category
@@ -89,7 +104,6 @@ void inScre(Dice diceRll[],Score &card, string lName,set<int> &prvScrd){
         cout<<"Enter the number in the brackets on the left to select."<<endl;
         cin>>input;
     }
-    
     //Input score into correct category
     //Check how many of each face was rolled
     card.chkDice(diceRll[0].getFace(),diceRll[1].getFace(),diceRll[2].getFace(),
@@ -268,7 +282,6 @@ void intro(){
     showList(introd);
 }
 
-
 void showSet(set <int> g){ 
     set <int> :: iterator it; 
     for(it=g.begin();it!=g.end();it++){
@@ -284,3 +297,67 @@ void showList(list <string> g){
     }
     cout<<endl;
 } 
+
+void fBoard(Score &card,fstream &data,string lName){
+    //Clears end of file flag
+    data.clear();
+    //Returns to the beginning of file
+    data.seekg(0, ios::beg);
+    if(data.is_open()){
+        //Used \r\n to format in file
+        data<<lName<<"'s Card \r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<"      Upper Section      "<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<" [1] Aces           |"<<right<<setw(4)<<card.getCat(0)<<"\r\n";
+        data<<" [2] Twos           |"<<setw(4)<<card.getCat(1)<<"\r\n";
+        data<<" [3] Threes         |"<<setw(4)<<card.getCat(2)<<"\r\n";
+        data<<" [4] Fours          |"<<setw(4)<<card.getCat(3)<<"\r\n";
+        data<<" [5] Fives          |"<<setw(4)<<card.getCat(4)<<"\r\n";
+        data<<" [6] Sixes          |"<<setw(4)<<card.getCat(5)<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<"Total               |"<<setw(4)<<card.getCat(14)-card.getCat(6)<<"\r\n";
+        data<<"Bonus (total >= 63) |"<<setw(4)<<card.getCat(6)<<"\r\n";
+        data<<"Total of upper half |"<<setw(4)<<card.getCat(14)<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<"      Lower Section      "<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<" [7] 3 of a kind    |"<<setw(4)<<card.getCat(7)<<"\r\n";
+        data<<" [8] 4 of a kind    |"<<setw(4)<<card.getCat(8)<<"\r\n";
+        data<<" [9] Full house     |"<<setw(4)<<card.getCat(9)<<"\r\n";
+        data<<"[10] Small straight |"<<setw(4)<<card.getCat(10)<<"\r\n";
+        data<<"[11] Large straight |"<<setw(4)<<card.getCat(11)<<"\r\n";
+        data<<"[12] Yahtzee        |"<<setw(4)<<card.getCat(12)<<"\r\n";
+        data<<"[13] Chance         |"<<setw(4)<<card.getCat(13)<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<"Total of lower half |"<<setw(4)<<card.getCat(14)<<"\r\n";
+        data<<"Total of upper half |"<<setw(4)<<card.getCat(15)<<"\r\n";
+        data<<"Grand total         |"<<setw(4)<<card.getCat(16)<<"\r\n";
+        data<<"-------------------------"<<"\r\n";
+        data<<"\r\n";
+    }else cout<<"ERROR: Failure opening file. Scorecard will not save"<<endl;
+}
+
+void new2Old(fstream &fileOld,fstream &fileNew){
+    char ch;    //To hold a character
+    
+    //Read a char from file 1
+    fileNew.get(ch);
+    
+    if(fileNew.is_open()){
+    //Loop until finished
+        while(fileNew){
+            //Write char from file 1 to file 2
+            fileOld.put(ch);
+        
+            //Read next char from file 1
+            fileNew.get(ch);
+        }
+    }else{
+        cout<<"ERROR: Failure opening file."<<endl;
+        exit(EXIT_FAILURE);
+    }
+}
+// 276 lines of code
+// 62 lines of comments
+// 25  empty lines

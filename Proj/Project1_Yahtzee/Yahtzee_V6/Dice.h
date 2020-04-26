@@ -16,6 +16,7 @@ class Dice{
         //Constructors
         Dice(){sides=0,face=0;}             //Default Constructor
         Dice(int n){sides=n,face=0;}        //Constructor with number of sides
+        Dice(int n,int f){sides=n,face=f;}  //Constructor with number of sides + the face they all show
         //Set Functions
         void setSide(int n){sides=n;}       //Set number of sides
         void setFace(int n){face=n;}        //Set current face
@@ -27,6 +28,6 @@ class Dice{
 };
 
 #endif /* DICE_H */
-// 16 lines of code
+// 17 lines of code
 // 13 lines of comments
 // 3  empty lines
